@@ -175,7 +175,7 @@ def _web(port: int):
 
     @app.get("/health")
     async def health():
-        return {"status": "ok"}
+        return {"ok": True}
 
     # Public deployment: layered, in-memory rate limiting on POST.
     from _ratelimit import install_rate_limit
