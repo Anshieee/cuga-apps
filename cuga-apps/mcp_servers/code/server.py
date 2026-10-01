@@ -106,7 +106,7 @@ def detect_language(code: str) -> str:
         "php":        ["<?php", "$_", "echo ", "function ", "->", "array("],
         "sql":        ["select ", "from ", "where ", "insert into", "create table", "join "],
         "html":       ["<!doctype", "<html", "<div", "<body", "</", "class="],
-        "css":        ["{", "}", "color:", "margin:", "padding:", "display:"],
+        "css":        ["color:", "margin:", "padding:", "display:", "font-", "@media"],
         "bash":       ["#!/bin/bash", "echo ", "fi\n", "done\n", "$1", "grep "],
     }
     scores = {lang: sum(1 for p in patterns if p in cl) for lang, patterns in checks.items()}
