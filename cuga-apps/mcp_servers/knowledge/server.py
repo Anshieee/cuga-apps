@@ -12,6 +12,7 @@ All APIs are free / public — no keys required.
 """
 from __future__ import annotations
 
+import re
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -334,6 +335,10 @@ def get_paper_references(paper_id: str) -> str:
     Args:
         paper_id: Semantic Scholar paperId or "arXiv:XXXX.XXXXX".
     """
+    paper_id = paper_id.strip()
+    m = re.fullmatch(r"(\d{4}\.\d{4,5})(v\d+)?", paper_id)  # bare arXiv ID, e.g. "1706.03762v5"
+    if m:
+        paper_id = f"arXiv:{m.group(1)}"
     try:
         data = get_json(
             f"{_S2_API}/paper/{paper_id}/references",
