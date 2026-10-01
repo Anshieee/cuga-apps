@@ -67,6 +67,8 @@ Then open <http://127.0.0.1:28826> and try:
 | `LLM_MODEL`            | no       | model override                              |
 | `AGENT_SETTING_CONFIG` | no       | defaulted in `make_agent`                   |
 | `MEETUP_HEADLESS`      | no       | `0` to watch the browser (default headless) |
+| `MEETUP_BROWSER_LIBS`  | no       | folder with Chromium's system libraries on bare-metal hosts (default `~/.local/chromium-deps`) |
+| `MEETUP_NO_SANDBOX`    | no       | set to `1` to launch Chromium with `--no-sandbox` (needed as root / in containers) |
 
 ## Notes & caveats
 

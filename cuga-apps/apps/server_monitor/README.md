@@ -108,6 +108,7 @@ thresholds for CPU, RAM, and disk. Changes persist to `.store.json`.
 | `RAM_CRITICAL` | `92` | RAM critical % |
 | `DISK_THRESHOLD` | `80` | Disk warn % |
 | `DISK_CRITICAL` | `90` | Disk critical % |
+| `LOAD_THRESHOLD` | `1.5` | Load-average warning level, as a multiple of the CPU count |
 | `ALLOWED_SERVICES` | `nginx,postgres,redis,docker,sshd,cron` | Services the agent may query |
 
 Env vars set initial defaults. UI settings (persisted in `.store.json`) take
