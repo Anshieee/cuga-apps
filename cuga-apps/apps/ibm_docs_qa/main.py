@@ -8,10 +8,10 @@ Far better than ibm.com's own search bar.
 
 Run:
     python main.py
-    python main.py --port 18811
+    python main.py --port 28813
     python main.py --provider anthropic
 
-Then open: http://127.0.0.1:18811
+Then open: http://127.0.0.1:28813
 
 Environment variables:
     LLM_PROVIDER         rits | anthropic | openai | ollama | watsonx | litellm
