@@ -454,6 +454,24 @@ class TestMcpText:
         })
         _expect_error(env, code="bad_input")
 
+    def test_chunk_text_bad_overlap(self):
+        # overlap == size should be rejected, not hang
+        env = call_mcp_tool("text", "chunk_text", {
+            "text": "hello world " * 5,
+            "strategy": "fixed_chars",
+            "size": 10,
+            "overlap": 10,
+        })
+        _expect_error(env, code="bad_input")
+        # overlap > size should also be rejected
+        env2 = call_mcp_tool("text", "chunk_text", {
+            "text": "hello world " * 5,
+            "strategy": "recursive",
+            "size": 10,
+            "overlap": 20,
+        })
+        _expect_error(env2, code="bad_input")
+
     def test_count_tokens_cl100k(self):
         data = _expect_ok(call_mcp_tool("text", "count_tokens", {
             "text": "Hello, world!",
