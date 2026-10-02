@@ -77,4 +77,5 @@ APP_PORTS: dict[str, int] = {
     "usage_collector":            28827,
     "explain_like_five":          28830,
     "code_explainer":             28838,
+    "compare_two": 28833,
 }
