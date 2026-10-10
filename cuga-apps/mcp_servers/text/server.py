@@ -27,6 +27,29 @@ from apps._ports import MCP_TEXT_PORT  # noqa: E402
 mcp = make_server("mcp-text")
 
 
+# ── slugify ─────────────────────────────────────────────────────────────
+
+@mcp.tool()
+def slugify(text: str, max_length: int = 60) -> str:
+    """Turn a title or phrase into a URL-safe "slug", e.g. "Hello, World!" → "hello-world".
+
+    Lowercases, turns accented letters into plain ones (é → e), replaces anything that is
+    not a letter or digit with a hyphen, collapses repeated hyphens, and trims to max_length.
+
+    Args:
+        text: Input string (e.g. a blog-post title).
+        max_length: Longest slug to return (default 60).
+    """
+    import unicodedata
+
+    if max_length <= 0:
+        return tool_error("max_length must be a positive integer.", code="bad_input")
+    plain = unicodedata.normalize("NFKD", text or "").encode("ascii", "ignore").decode("ascii")
+    slug = re.sub(r"[^a-z0-9]+", "-", plain.lower()).strip("-")
+    slug = slug[:max_length].strip("-")
+    return tool_result({"slug": slug, "original_length": len(text or "")})
+
+
 # ── chunk_text ──────────────────────────────────────────────────────────
 
 _RECURSIVE_SEPARATORS = ["\n\n", "\n", ". ", " ", ""]

@@ -412,6 +412,10 @@ class TestMcpLocal:
 
 class TestMcpText:
 
+    def test_slugify(self):
+        data = _expect_ok(call_mcp_tool("text", "slugify", {"text": "Hello, World! Ça va?"}))
+        assert data["slug"] == "hello-world-ca-va"
+
     def test_chunk_text_recursive(self):
         text = "Section one.\n\nSection two with much more content here, definitely longer than the chunk size.\n\nSection three."
         data = _expect_ok(call_mcp_tool("text", "chunk_text", {
