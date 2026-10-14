@@ -268,6 +268,47 @@ def search_attractions(
 
 
 @mcp.tool()
+def convert_timezone(time: str, from_timezone: str, to_timezone: str) -> str:
+    """Convert a date/time from one time zone to another (e.g. for planning a call).
+
+    Uses IANA time-zone names such as "America/New_York", "Europe/London", "Asia/Kolkata".
+    Daylight-saving time is handled automatically. No network needed.
+
+    Args:
+        time: "YYYY-MM-DD HH:MM" (24-hour clock), e.g. "2026-03-10 09:30".
+        from_timezone: IANA zone the time is in, e.g. "America/New_York".
+        to_timezone: IANA zone to convert to, e.g. "Asia/Tokyo".
+    """
+    from datetime import datetime
+    from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+
+    try:
+        src, dst = ZoneInfo(from_timezone), ZoneInfo(to_timezone)
+    except (ZoneInfoNotFoundError, ValueError):
+        return tool_error(
+            f"Unknown time zone '{from_timezone}' or '{to_timezone}'. "
+            "Use IANA names like 'Europe/Paris' or 'America/Chicago'.",
+            code="bad_input",
+        )
+
+    try:
+        local = datetime.strptime(time.strip(), "%Y-%m-%d %H:%M").replace(tzinfo=src)
+    except ValueError:
+        return tool_error(
+            "time must look like 'YYYY-MM-DD HH:MM', e.g. '2026-03-10 09:30'.",
+            code="bad_input",
+        )
+
+    out = local.astimezone(dst)
+    return tool_result({
+        "from": local.strftime("%Y-%m-%d %H:%M %Z"),
+        "to": out.strftime("%Y-%m-%d %H:%M %Z"),
+        "utc_offset": out.strftime("%z"),
+        "day_changed": out.date() != local.date(),
+    })
+
+
+@mcp.tool()
 def get_weather(city: str, travel_month: str = "") -> str:
     """Fetch current weather + 3-day forecast for a city via wttr.in.
 
