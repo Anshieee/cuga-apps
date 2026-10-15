@@ -278,7 +278,7 @@ server-side, so your laptop only needs an LLM provider):
 |---|---|
 | `web` | `web_search` (Tavily), `fetch_webpage`, `fetch_feed`, YouTube transcripts |
 | `knowledge` | Wikipedia, arXiv, Semantic Scholar |
-| `geo` | `geocode`, `get_weather`, `find_hikes`, `search_attractions` |
+| `geo` | `geocode`, `get_weather`, `find_hikes`, `search_attractions`, `get_sunrise_sunset` |
 | `finance` | `get_crypto_price` (CoinGecko), `get_stock_quote` (Alpha Vantage) |
 | `code` | `check_python_syntax`, `extract_code_metrics`, `detect_language` |
 | `local` | system metrics, processes, disk usage, audio transcription |

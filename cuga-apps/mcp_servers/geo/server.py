@@ -13,6 +13,7 @@ from __future__ import annotations
 import math
 import os
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 _HERE = Path(__file__).resolve().parent
@@ -111,6 +112,47 @@ def geocode(place: str) -> str:
         })
     except Exception as exc:
         return tool_error(f"Geocode failed: {exc}", code="upstream")
+
+
+@mcp.tool()
+def get_sunrise_sunset(lat: float, lon: float, date: str = "today") -> str:
+    """Get sunrise, sunset, solar noon and day length for a location (times in UTC).
+
+    Uses sunrise-sunset.org (no API key). Call geocode first if you only have a place name.
+    All times are UTC, so for far-east or far-west longitudes a sunrise/sunset can fall
+    on the previous or next calendar day relative to the requested local date.
+
+    Args:
+        lat: Latitude in degrees (-90..90).
+        lon: Longitude in degrees (-180..180).
+        date: "YYYY-MM-DD" or "today" (default).
+    """
+    if not (-90 <= lat <= 90 and -180 <= lon <= 180):
+        return tool_error("lat must be in -90..90 and lon in -180..180.", code="bad_input")
+    if date == "today":
+        date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    else:
+        try:
+            datetime.strptime(date, "%Y-%m-%d")
+        except (TypeError, ValueError):
+            return tool_error(f"Invalid date '{date}'; use YYYY-MM-DD or 'today'.", code="bad_input")    
+    try:
+        data = get_json("https://api.sunrise-sunset.org/json",
+                        params={"lat": lat, "lng": lon, "date": date, "formatted": 0})
+    except Exception as exc:
+        return tool_error(f"sunrise-sunset.org failed: {exc}", code="upstream")
+    if data.get("status") != "OK":
+        return tool_error(f"sunrise-sunset.org: {data.get('status')}", code="bad_input")
+    r = data["results"]
+    # Polar day/night: the API returns a 1970-01-01 placeholder for a sunrise/sunset that doesn't happen.
+    real = lambda t: None if (t or "").startswith("1970-") else t  # noqa: E731
+    return tool_result({
+        "lat": lat, "lon": lon, "date": date,
+        "sunrise_utc":      real(r.get("sunrise")),
+        "sunset_utc":       real(r.get("sunset")),
+        "solar_noon_utc":   real(r.get("solar_noon")),
+        "day_length_hours": round((r.get("day_length") or 0) / 3600, 2),
+    })
 
 
 @mcp.tool()
