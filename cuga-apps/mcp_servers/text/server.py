@@ -35,6 +35,8 @@ _RECURSIVE_SEPARATORS = ["\n\n", "\n", ". ", " ", ""]
 def _chunk_fixed_chars(text: str, size: int, overlap: int) -> list[str]:
     if size <= 0:
         return [text]
+    # Clamp overlap so the loop always advances; callers validate before calling.
+    overlap = min(overlap, size - 1)
     chunks: list[str] = []
     start = 0
     n = len(text)
@@ -119,13 +121,18 @@ def chunk_text(
                   on `#` / `##` / etc; falls back to fixed within long sections).
         size: Target chunk size in characters (default 800).
         overlap: Overlap in characters between adjacent chunks (default 100).
-                 Ignored by markdown_headers.
+                 Must be smaller than size. Ignored by markdown_headers.
 
     Returns:
         {chunks: [str, ...], count: int, strategy: str, size: int}
     """
     if not text:
         return tool_result({"chunks": [], "count": 0, "strategy": strategy, "size": size})
+    if strategy != "markdown_headers" and (overlap < 0 or 0 < size <= overlap):
+        return tool_error(
+            f"overlap ({overlap}) must be 0 or more and smaller than size ({size}).",
+            code="bad_input",
+        )
     if strategy == "fixed_chars":
         chunks = _chunk_fixed_chars(text, size, overlap)
     elif strategy == "markdown_headers":
