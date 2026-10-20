@@ -12,6 +12,7 @@ All APIs are free / public — no keys required.
 """
 from __future__ import annotations
 
+import re
 import sys
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -328,12 +329,17 @@ def get_paper_references(paper_id: str) -> str:
     """Fetch the reference list of a Semantic Scholar paper.
 
     paper_id is the Semantic Scholar paperId from search results, or an arXiv
-    ID prefixed with "arXiv:" (e.g. "arXiv:2305.11206"). Returns up to 10
-    cited papers with title, authors, year, and citation count.
+    ID, either bare (e.g. "2305.11206" or "2305.11206v2") or prefixed with
+    "arXiv:" (e.g. "arXiv:2305.11206"). Returns up to 10 cited papers with
+    title, authors, year, and citation count.
 
     Args:
-        paper_id: Semantic Scholar paperId or "arXiv:XXXX.XXXXX".
+        paper_id: Semantic Scholar paperId, "XXXX.XXXXX", or "arXiv:XXXX.XXXXX".
     """
+    paper_id = paper_id.strip()
+    m = re.fullmatch(r"(\d{4}\.\d{4,5})(v\d+)?", paper_id)
+    if m:
+        paper_id = f"arXiv:{m.group(1)}"
     try:
         data = get_json(
             f"{_S2_API}/paper/{paper_id}/references",
