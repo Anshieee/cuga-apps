@@ -339,6 +339,12 @@ class TestMcpCode:
         }))
         assert data["language"] == "javascript"
 
+    def test_detect_language_css(self):
+        data = _expect_ok(call_mcp_tool("code", "detect_language", {
+            "code": "body { color: red; margin: 0; }\n",
+        }))
+        assert data["language"] == "css"
+
 
 # ─── mcp-local ───────────────────────────────────────────────────────────
 
