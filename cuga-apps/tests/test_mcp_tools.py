@@ -244,6 +244,34 @@ class TestMcpGeo:
         assert isinstance(data["forecast"], list)
 
     @pytest.mark.external
+    def test_get_sunrise_sunset(self):
+        data = _expect_ok(call_mcp_tool("geo", "get_sunrise_sunset", {"lat": 48.8566, "lon": 2.3522, "date": "2026-10-08"}))
+        assert data["sunrise_utc"].startswith("2026-10-08")
+        assert 10 < data["day_length_hours"] < 13
+
+    def test_get_sunrise_sunset_rejects_bad_coordinates(self):
+        _expect_error(call_mcp_tool("geo", "get_sunrise_sunset", {"lat": 999, "lon": 2}), code="bad_input")
+
+    def test_get_sunrise_sunset_rejects_bad_longitude(self):
+        _expect_error(call_mcp_tool("geo", "get_sunrise_sunset", {"lat": 0, "lon": 181}), code="bad_input")
+
+    @pytest.mark.parametrize("bad_date", ["not-a-date", "2026-13-40", "10/08/2026", ""])
+    def test_get_sunrise_sunset_rejects_bad_date(self, bad_date):
+        # Validated locally, so this never reaches the upstream API.
+        _expect_error(
+            call_mcp_tool("geo", "get_sunrise_sunset", {"lat": 48.8566, "lon": 2.3522, "date": bad_date}),
+            code="bad_input",
+        )
+
+    @pytest.mark.external
+    def test_get_sunrise_sunset_default_resolves_today(self):
+        data = _expect_ok(call_mcp_tool("geo", "get_sunrise_sunset", {"lat": 48.8566, "lon": 2.3522}))
+        # "today" is resolved to an explicit UTC date, not echoed literally.
+        assert data["date"] != "today"
+        assert len(data["date"]) == 10 and data["date"][4] == "-" and data["date"][7] == "-"
+        assert data["sunrise_utc"] < data["sunset_utc"]        
+
+    @pytest.mark.external
     def test_find_hikes(self):
         # Mt. Rainier area.
         env = call_mcp_tool("geo", "find_hikes", {
