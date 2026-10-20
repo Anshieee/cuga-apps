@@ -218,6 +218,21 @@ class TestMcpGeo:
         assert 48 < data["lat"] < 49
         assert 2 < data["lon"] < 3
 
+    def test_convert_timezone(self):
+        data = _expect_ok(call_mcp_tool("geo", "convert_timezone", {
+            "time": "2026-03-10 09:30",
+            "from_timezone": "America/New_York",
+            "to_timezone": "Asia/Tokyo",
+        }))
+        assert data["to"].startswith("2026-03-10 22:30")
+
+    def test_convert_timezone_rejects_unknown_zone(self):
+        _expect_error(call_mcp_tool("geo", "convert_timezone", {
+            "time": "2026-03-10 09:30",
+            "from_timezone": "Mars/Olympus",
+            "to_timezone": "Asia/Tokyo",
+        }), code="bad_input")
+
     @pytest.mark.external
     def test_get_weather(self):
         data = _expect_ok(call_mcp_tool("geo", "get_weather", {
