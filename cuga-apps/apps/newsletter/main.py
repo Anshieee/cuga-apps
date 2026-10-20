@@ -12,7 +12,7 @@ Run:
     python main.py --port 8080
     python main.py --provider anthropic
 
-Then open: http://127.0.0.1:18793
+Then open: http://127.0.0.1:28793
 
 Prerequisites:
     pip install -r requirements.txt
@@ -925,7 +925,7 @@ setInterval(loadAlerts, 30000)
 
 def main():
     parser = argparse.ArgumentParser(description="Newsletter Intelligence — web UI")
-    parser.add_argument("--port",     type=int, default=18793)
+    parser.add_argument("--port",     type=int, default=28793)
     parser.add_argument("--provider", "-p", default=None,
                         choices=["rits", "watsonx", "openai", "anthropic", "litellm", "ollama"])
     parser.add_argument("--model",    "-m", default=None)
