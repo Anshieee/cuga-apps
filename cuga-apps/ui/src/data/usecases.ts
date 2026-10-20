@@ -161,7 +161,7 @@ new Notification("Stock Alert — BTC", { body: ... })
     },
     architecture:
       'FastAPI serves the single-page UI. Chat: POST /ask → CugaAgent.invoke(question) → psutil-based tools → diagnosis. Background monitor: asyncio loop polls metrics every N seconds; when a threshold is breached and cooldown has elapsed, the agent diagnoses and appends to the Alert Log. Thresholds, poll interval, and cooldown are configurable in the UI and persisted to .store.json.',
-    diagram: `python main.py  →  http://127.0.0.1:8767
+    diagram: `python main.py  →  http://127.0.0.1:28767
 
 Live Metrics panel (auto-refresh every 15s):
   CPU 45% ██████░░░░  RAM 61% ████████░░  Disk 72% █████████░
@@ -229,7 +229,7 @@ Alert entry: "python train.py consuming 88% CPU since 14:02"`,
     },
     architecture:
       'FastAPI web server serves the single-page UI. Feed Query: POST /ask → CugaAgent.invoke(question) → make_feed_tools() fetches and parses RSS/Atom feeds → answer. Scheduled Alerts: asyncio background scheduler checks each alert on its cron interval → agent searches feeds for keyword matches → triggered alerts surface in the in-UI Recent Alerts panel. All state saved to .store.json.',
-    diagram: `python main.py  →  http://127.0.0.1:18793
+    diagram: `python main.py  →  http://127.0.0.1:28793
 
 Panel 1 — Feed Query (on-demand):
 User: "Find anything about agentic AI this week"
@@ -356,7 +356,7 @@ CugaAgent (guided by skills/video_qa.md)
     },
     architecture:
       'FastAPI serves the single-page UI. Upload: user drops a file via the browser; the app extracts text (.txt/.md read directly; .pdf/images via docling running in a subprocess so OOM kills do not crash the server), then passes the content to the agent for summarisation. App stores content + summary in SQLite. Chat: POST /ask → for specific files, the stored content is injected into the prompt; for general queries, recent summaries are injected as context.',
-    diagram: `python main.py  →  http://127.0.0.1:18794
+    diagram: `python main.py  →  http://127.0.0.1:28794
 
 User uploads ./inbox/report.pdf via the browser
       │
@@ -422,7 +422,7 @@ CugaAgent → answer`,
     },
     architecture:
       'FastAPI serves the single-page UI. Chat: POST /ask → CugaAgent calls web_search (Tavily) → answer. Scheduled topics: asyncio background scheduler checks every 5 minutes for overdue topics; when due, runs the agent and appends results to the in-UI Research Log (no email). Topic schedule persisted in .store.json.',
-    diagram: `python main.py  →  http://127.0.0.1:18798
+    diagram: `python main.py  →  http://127.0.0.1:28798
 
 Chat panel (ad-hoc):
 User: "What's the latest news on quantum computing?"
@@ -488,7 +488,7 @@ Research Log panel (in-UI, auto-refreshed every 30s)`,
     },
     architecture:
       'FastAPI serves the single-page UI. Inbox watcher: asyncio loop monitors ./inbox for new audio/text files; audio is transcribed via OpenAI Whisper API, then the agent structures the entry and stores it in SQLite + a Markdown file under ./entries/. Email digest: configurable schedule sends a summary of recent entries via SMTP.',
-    diagram: `python main.py  →  http://127.0.0.1:18799
+    diagram: `python main.py  →  http://127.0.0.1:28799
 
 Inbox watcher (background, auto):
 ./inbox/memo_20260421.m4a  (new file detected)
@@ -555,7 +555,7 @@ CugaAgent → "You mentioned deadlines and team collaboration…"`,
     },
     architecture:
       'FastAPI serves the single-page UI. Chat: POST /ask → CugaAgent parses natural language → adds todos to SQLite (todos.db) with due dates extracted from context. Background reminder watcher: asyncio loop checks every 60s for overdue items and surfaces them in the Recent Alerts panel. Todo board renders Todos / Reminders / Notes / Done tabs from SQLite on each load.',
-    diagram: `python main.py  →  http://127.0.0.1:18800
+    diagram: `python main.py  →  http://127.0.0.1:28800
 
 Chat panel (on-demand):
 User: "Remind me to review the PR before EOD"
@@ -617,7 +617,7 @@ Recent Alerts panel (in-UI): "Reminder: Review the PR is due now"`,
     },
     architecture:
       'FastAPI serves the single-page UI. POST /plan → CugaAgent calls get_city_overview(), get_weather(), search_attractions(), web_search() → full day-by-day itinerary with budget breakdown. POST /chat → multi-turn follow-up on the same plan. POST /configure injects API keys at runtime — no restart needed. The LangGraph ReAct backend is available as an alternative via the same UI toggle.',
-    diagram: `uv run main.py  →  http://127.0.0.1:8090
+    diagram: `uv run main.py  →  http://127.0.0.1:28090
 
 User: "5 days in Kyoto in March, mid-range budget"
       │  POST /plan
@@ -677,11 +677,11 @@ CugaAgent (full plan in context) → updated itinerary`,
         'cd apps/deck_forge',
         'pip install -r requirements.txt',
       ],
-      command: 'python main.py --port 18802',
+      command: 'python main.py --port 28802',
     },
     architecture:
       'FastAPI serves the single-page UI. POST /api/generate creates a session and launches an asyncio task that runs the LangGraph ReAct agent. The agent calls five async tools (closed over the session): list_directory discovers files; extract_and_index uses pdfplumber / python-pptx / faster-whisper to extract text and chunk-embed it into an ephemeral ChromaDB collection; search_knowledge_base retrieves relevant chunks by semantic similarity; add_slide accumulates slides; finalize writes deck.pptx and deck.md. Each tool pushes typed events to session.queue, which the SSE endpoint streams to the browser in real time.',
-    diagram: `python main.py  →  http://127.0.0.1:18802
+    diagram: `python main.py  →  http://127.0.0.1:28802
 
 User: directory=/research/transformers  topic="Self-Attention in Transformers"
       │  POST /api/generate
@@ -749,7 +749,7 @@ SSE stream → browser: live progress per tool call`,
     },
     architecture:
       'FastAPI serves the single-page UI. POST /ask → CugaAgent uses web_search (Tavily) to find YouTube videos, get_video_info (oEmbed) for metadata, get_transcript (youtube-transcript-api) for captions → synthesises across transcripts with citations and timestamps. Research log stored in SQLite.',
-    diagram: `python main.py  →  http://127.0.0.1:18803
+    diagram: `python main.py  →  http://127.0.0.1:28803
 
 Topic mode:
 User: "Latest developments in AI agents"
@@ -815,7 +815,7 @@ CugaAgent → get_video_info + get_transcript → summary with timestamps`,
     },
     architecture:
       'FastAPI serves the single-page UI with mermaid.js loaded from CDN. POST /ask → CugaAgent generates Mermaid code in a fenced code block → server extracts the code via regex → frontend renders SVG via mermaid.js. The system prompt includes full Mermaid syntax reference with examples for each diagram type to minimise invalid output. Iterative refinement works via the agent thread — the agent remembers the previous diagram and modifies it.',
-    diagram: `python main.py  →  http://127.0.0.1:18804
+    diagram: `python main.py  →  http://127.0.0.1:28804
 
 User: "Design a microservices e-commerce platform"
       │  POST /ask
@@ -885,7 +885,7 @@ CugaAgent → updated diagram with cache node added`,
     },
     architecture:
       'FastAPI serves the single-page UI. POST /ask → CugaAgent calls geocode_location (Nominatim/OpenStreetMap) to convert a place name to lat/lon, then find_hikes (Overpass API) to fetch named hiking route relations, filtered by difficulty and kid-friendliness. GET /hikes returns the cached results for the live trail-card panel. get_review_summary uses Tavily to search for and synthesise hiker reviews for a specific trail.',
-    diagram: `python main.py  →  http://127.0.0.1:18805
+    diagram: `python main.py  →  http://127.0.0.1:28805
 
 User: "Easy hikes near Yosemite, CA"
       │  POST /ask
@@ -949,11 +949,11 @@ CugaAgent → get_review_summary("Mist Trail", "Yosemite")
         'cd apps/movie_recommender',
         'pip install -r requirements.txt',
       ],
-      command: 'python main.py --port 18806',
+      command: 'python main.py --port 28806',
     },
     architecture:
       'FastAPI serves the single-page UI. POST /ask → CugaAgent uses save_preference to record genres, liked/disliked films, actors, directors, and moods; get_preferences recalls the full profile; lookup_movie verifies details via Wikipedia; save_recommendations persists the structured card list. GET /session/{thread_id} returns the live profile and recommendation cards.',
-    diagram: `python main.py  →  http://127.0.0.1:18806
+    diagram: `python main.py  →  http://127.0.0.1:28806
 
 User: "I love Inception and The Dark Knight"
       │  POST /ask
@@ -1009,11 +1009,11 @@ Recommendation cards rendered in the right panel`,
         'cd apps/webpage_summarizer',
         'pip install -r requirements.txt',
       ],
-      command: 'python main.py --port 8071',
+      command: 'python main.py --port 28071',
     },
     architecture:
       'FastAPI serves the single-page UI. POST /ask → CugaAgent calls fetch_webpage (httpx + BeautifulSoup, truncated to 12 000 chars) → produces structured summary. fetch_webpage_links returns the list of external links for site exploration. No state is stored between requests.',
-    diagram: `python main.py  →  http://127.0.0.1:8071
+    diagram: `python main.py  →  http://127.0.0.1:28071
 
 User: "Summarize https://en.wikipedia.org/wiki/Large_language_model"
       │  POST /ask
@@ -1069,11 +1069,11 @@ User: "List all links on https://news.ycombinator.com"
         'cd apps/code_reviewer',
         'pip install -r requirements.txt',
       ],
-      command: 'python main.py --port 18807',
+      command: 'python main.py --port 28807',
     },
     architecture:
       'FastAPI serves the single-page UI. POST /review → CugaAgent calls detect_language, check_python_syntax (Python only, AST-based), and extract_code_metrics → structured review with severity badges. POST /ask → free-form follow-up on any loaded code. POST /upload → reads a source file and returns its text so the UI can populate the code area. GET /history → in-memory list of last 50 reviews (session-scoped).',
-    diagram: `python main.py  →  http://127.0.0.1:18807
+    diagram: `python main.py  →  http://127.0.0.1:28807
 
 User: pastes Python function, selects "Security" focus, clicks Review
       │  POST /review  {code, language:"python", focus:"security"}
@@ -1134,11 +1134,11 @@ CugaAgent (code injected as context) → refactoring walkthrough`,
         'cd apps/paper_scout',
         'pip install -r requirements.txt',
       ],
-      command: 'python main.py --port 18808',
+      command: 'python main.py --port 28808',
     },
     architecture:
       'FastAPI serves the single-page UI. POST /ask → CugaAgent calls search_arxiv and search_semantic_scholar in parallel, deduplicates results, then synthesises a structured report grouped by theme with inline citations (title, URL, citation count, year). For direct arXiv IDs, get_arxiv_paper is called immediately. get_paper_references fetches the Semantic Scholar reference graph for any paper. No API keys required — arXiv and Semantic Scholar both offer free public APIs.',
-    diagram: `python main.py  →  http://127.0.0.1:18808
+    diagram: `python main.py  →  http://127.0.0.1:28808
 
 Mode 1 — Topic research:
 User: "LoRA and parameter-efficient fine-tuning"
@@ -1204,11 +1204,11 @@ CugaAgent
         'cd apps/wiki_dive',
         'pip install -r requirements.txt',
       ],
-      command: 'python main.py --port 18809',
+      command: 'python main.py --port 28809',
     },
     architecture:
       'FastAPI serves the single-page UI. POST /ask → CugaAgent calls search_wikipedia to identify relevant articles, get_article_summary for a quick relevance check, get_article_sections for deep section-by-section reading of the primary article, get_related_articles to discover connected concepts, then get_article_summary on 2-3 related articles for breadth. The agent synthesises across all content into a structured report. No API keys required — uses Wikipedia\'s free public REST API and MediaWiki action API.',
-    diagram: `python main.py  →  http://127.0.0.1:18809
+    diagram: `python main.py  →  http://127.0.0.1:28809
 
 User: "How does transformer attention work?"
       │  POST /ask
@@ -1273,7 +1273,7 @@ Synthesised report:
     },
     architecture:
       'FastAPI serves the single-page UI. POST /ask → CugaAgent uses list_box_folder (Box SDK JWT auth) to enumerate files, search_box to find relevant candidates, get_file_content to download and extract text (plain read for TXT/CSV/MD; docling OCR for PDF/DOCX/PPTX/XLSX) → answers with file citations. Two-panel UI: left is conversational chat (thread-aware, multi-turn), right shows the latest agent response in full.',
-    diagram: `python main.py  →  http://127.0.0.1:18810
+    diagram: `python main.py  →  http://127.0.0.1:28810
 
 User: "What does the Q4 report say about revenue?"
       │  POST /ask
@@ -1325,11 +1325,11 @@ Answer with citation:
         'cd apps/ibm_whats_new',
         'pip install -r requirements.txt',
       ],
-      command: 'python main.py --port 18814',
+      command: 'python main.py --port 28814',
     },
     architecture:
       "FastAPI serves the single-page UI. Chat: POST /ask → CugaAgent calls search_ibm_updates (Tavily scoped to ibm.com/cloud.ibm.com) + fetch_release_notes (httpx + BeautifulSoup, IBM URLs only) → answer with sources. Background scheduler: asyncio task checks every 5 minutes whether a digest is due; when due, agent checks each tracked service in turn, collects UPDATE: responses, and sends an SMTP digest. State persisted in .store.json.",
-    diagram: `python main.py  →  http://127.0.0.1:18814
+    diagram: `python main.py  →  http://127.0.0.1:28814
 
 Chat panel (on-demand):
 User: "What changed in Code Engine this month?"
@@ -1392,11 +1392,11 @@ SMTP digest → DIGEST_TO`,
         'cd apps/ibm_cloud_advisor',
         'pip install -r requirements.txt',
       ],
-      command: 'python main.py --port 18812',
+      command: 'python main.py --port 28812',
     },
     architecture:
       'FastAPI serves the single-page UI. POST /ask → CugaAgent calls search_ibm_catalog (IBM Global Catalog public REST API — no key needed) with 2–3 keyword queries to find real services, optionally calls search_ibm_docs (Tavily restricted to ibm.com) for pricing and architecture patterns, then produces a structured recommendation with CLI commands. No state stored between sessions.',
-    diagram: `python main.py  →  http://127.0.0.1:18812
+    diagram: `python main.py  →  http://127.0.0.1:28812
 
 User: "Event-driven microservices with a message queue and a managed database"
       │  POST /ask
@@ -1459,11 +1459,11 @@ ibmcloud CLI:
         'cd apps/ibm_docs_qa',
         'pip install -r requirements.txt',
       ],
-      command: 'python main.py --port 18813',
+      command: 'python main.py --port 28813',
     },
     architecture:
       'FastAPI serves the single-page UI. POST /ask → CugaAgent calls search_ibm_docs (Tavily restricted to ibm.com/cloud.ibm.com, search_depth=advanced) to find relevant pages, then optionally calls fetch_doc_page (httpx + BeautifulSoup, strips nav/header/footer, extracts main content up to 6000 chars) on the most relevant URL. Agent synthesises across sources and cites every claim with a page title and URL.',
-    diagram: `python main.py  →  http://127.0.0.1:18813
+    diagram: `python main.py  →  http://127.0.0.1:28813
 
 User: "How do I set up a private endpoint for Cloud Object Storage?"
       │  POST /ask
@@ -1525,11 +1525,11 @@ CugaAgent (previous context retained) → follow-up with comparison table`,
         'cd apps/api_doc_gen',
         'pip install -r requirements.txt',
       ],
-      command: 'python main.py --port 18811',
+      command: 'python main.py --port 28811',
     },
     architecture:
       'FastAPI serves the single-page UI. POST /ask → CugaAgent calls list_endpoints to survey the loaded spec, get_endpoint_details for each endpoint being documented, and get_schema to resolve $ref models — then writes structured Markdown with tables, curl examples, and example responses. POST /load-spec parses JSON/YAML and stores it server-side. POST /upload-spec handles file uploads. Five sample OpenAPI specs are embedded in the UI for one-click loading. No database — spec is in-memory, conversation is thread-aware.',
-    diagram: `python main.py  →  http://127.0.0.1:18811
+    diagram: `python main.py  →  http://127.0.0.1:28811
 
 User loads Stripe Payments spec (sample), then:
 User: "Document all endpoints"
