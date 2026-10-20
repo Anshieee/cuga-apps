@@ -210,7 +210,7 @@ Use the same `thread_id` as your `/plan` call to continue in context.
 ### `GET /health`
 
 ```json
-{ "status": "ok" }
+{ "ok": true }
 ```
 
 ---
