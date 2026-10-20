@@ -196,9 +196,22 @@ class _ArgsSchemaShim(dict):
         return dict(self)
 
     # Also expose model_fields for any code path that uses it for arg names.
+    # cuga >= 0.3 reads `field.annotation` (Pydantic FieldInfo), so map each
+    # JSON-Schema property to an object carrying the equivalent Python type.
     @property
     def model_fields(self) -> dict:
-        return self.get("properties", {}) or {}
+        from types import SimpleNamespace
+        props = self.get("properties", {}) or {}
+        return {
+            name: SimpleNamespace(annotation=_JSON_TO_PY.get((spec or {}).get("type")))
+            for name, spec in props.items()
+        }
+
+
+_JSON_TO_PY = {
+    "string": str, "integer": int, "number": float,
+    "boolean": bool, "array": list, "object": dict,
+}
 
 
 # Generic note appended to every MCP tool's description so cuga's code-
@@ -277,6 +290,13 @@ def _wrap_tool_for_cuga(tool, server: str | None = None):
             return result
 
         tool.coroutine = _wrapped
+        # _wrapped returns the unwrapped value, not a (content, artifact)
+        # tuple — tell LangChain so the .ainvoke path (used by cuga >= 0.3)
+        # doesn't reject it.
+        try:
+            tool.response_format = "content"
+        except Exception:
+            pass
 
     # ── 2. Pydantic-style methods on args_schema ───────────────────────
     schema = getattr(tool, "args_schema", None)
