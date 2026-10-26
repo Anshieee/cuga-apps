@@ -80,4 +80,5 @@ APP_PORTS: dict[str, int] = {
     "compare_two": 28833,
     "on_this_day":                28834,
     "weather_wardrobe":           28835,
+    "repo_explainer":             28837,
 }
